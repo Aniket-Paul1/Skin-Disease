@@ -1,16 +1,24 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle, Info, ChevronRight, Stethoscope } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  ChevronRight,
+  Stethoscope,
+} from 'lucide-react';
 import { PredictionResult } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 interface PredictionCardProps {
   prediction: PredictionResult;
-  onFindDoctors: () => void;
+  onShowHospitals: () => void;
 }
 
-const PredictionCard: React.FC<PredictionCardProps> = ({ prediction, onFindDoctors }) => {
-  // 1. Define the config
+const PredictionCard: React.FC<PredictionCardProps> = ({
+  prediction,
+  onShowHospitals,
+}) => {
   const severityConfig = {
     mild: {
       icon: Info,
@@ -35,31 +43,39 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ prediction, onFindDocto
     },
   };
 
-  // 2. SAFE FALLBACK: If prediction.severity is undefined or wrong, default to 'mild'
-  const severityKey = (prediction.severity?.toLowerCase() as keyof typeof severityConfig) || 'mild';
+  const severityKey =
+    (prediction.severity?.toLowerCase() as keyof typeof severityConfig) ||
+    'mild';
+
   const severity = severityConfig[severityKey] || severityConfig.mild;
   const SeverityIcon = severity.icon;
 
   return (
     <div className="bg-card rounded-2xl shadow-card border border-border overflow-hidden animate-scale-in">
       {/* Header */}
-      <div className={cn("p-6", severity.bgColor, "border-b", severity.borderColor)}>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className={cn("p-2 rounded-xl bg-white/50 shadow-sm")}>
-              <SeverityIcon className={cn("w-6 h-6", severity.color)} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-foreground">{prediction.disease}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={cn("text-sm font-medium", severity.color)}>
-                  {severity.label} Severity
-                </span>
-                <span className="text-muted-foreground">•</span>
-                <span className="text-sm text-muted-foreground">
-                  {prediction.confidence.toFixed(1)}% confidence
-                </span>
-              </div>
+      <div
+        className={cn(
+          'p-6 border-b',
+          severity.bgColor,
+          severity.borderColor
+        )}
+      >
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-xl bg-white/50 shadow-sm">
+            <SeverityIcon className={cn('w-6 h-6', severity.color)} />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-foreground">
+              {prediction.disease}
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={cn('text-sm font-medium', severity.color)}>
+                {severity.label} Severity
+              </span>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-sm text-muted-foreground">
+                {prediction.confidence.toFixed(1)}% confidence
+              </span>
             </div>
           </div>
         </div>
@@ -67,28 +83,31 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ prediction, onFindDocto
 
       {/* Body */}
       <div className="p-6 space-y-6">
+        {prediction.recommendations &&
+          prediction.recommendations.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide">
+                Recommendations
+              </h4>
+              <ul className="space-y-2">
+                {prediction.recommendations.map((rec, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
+                    <span className="text-muted-foreground">{rec}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        {/* Recommendations - Added a check for empty array */}
-        {prediction.recommendations && prediction.recommendations.length > 0 && (
-          <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-              Recommendations
-            </h4>
-            <ul className="space-y-2">
-              {prediction.recommendations.map((rec, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">{rec}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Action */}
-        <Button onClick={onFindDoctors} variant="default" size="lg" className="w-full gap-2 font-bold">
+        <Button
+          onClick={onShowHospitals}
+          variant="default"
+          size="lg"
+          className="w-full gap-2 font-bold"
+        >
           <Stethoscope className="w-5 h-5" />
-          Find Nearby Specialists
+          Find Nearby Hospitals
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>

@@ -63,6 +63,28 @@ const Dashboard: React.FC = () => {
 
     if (!error) setHistory(data || []);
   };
+  const fetchHospitals = async () => {
+    if (!city || !stateName) return;
+
+    try {
+      setIsLocating(true);
+
+      const res = await fetch(
+        `http://127.0.0.1:8000/verified-doctors?city=${encodeURIComponent(
+          city
+        )}&state=${encodeURIComponent(stateName)}`
+      );
+
+      const data = await res.json();
+      setRealHospitals(data);
+      setShowRecommendations(true);
+    } catch (err) {
+      console.error("Hospital fetch failed", err);
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
 
   useEffect(() => {
     if (user) fetchHistory();
@@ -76,27 +98,6 @@ const Dashboard: React.FC = () => {
       .catch(err => console.error("Failed to load states", err));
   }, []);
 
-  useEffect(() => {
-    if (!city || !stateName || !prediction) return;
-
-    setIsLocating(true);
-
-    fetch(
-      `http://127.0.0.1:8000/verified-doctors?city=${encodeURIComponent(
-        city
-      )}&state=${encodeURIComponent(stateName)}`
-    )
-      .then(res => res.json())
-      .then(data => {
-        setRealHospitals(data);
-        setShowRecommendations(true);
-      })
-      .catch(err => {
-        console.error("Hospital fetch failed", err);
-      })
-      .finally(() => setIsLocating(false));
-
-  }, [city, stateName]);
 
 
   useEffect(() => {
@@ -309,6 +310,9 @@ const Dashboard: React.FC = () => {
       setIsAnalyzing(false);
     }
   };
+  const handleShowHospitals = () => {
+    fetchHospitals();
+  };
 
   const handleSaveLocation = async () => {
     if (!city || !stateName) {
@@ -381,6 +385,13 @@ const Dashboard: React.FC = () => {
                 </header>
                 <ImageUpload onImageSelect={handleImageSelect} isAnalyzing={isAnalyzing} />
               </div>
+              {!prediction && !isAnalyzing && !showRecommendations && (
+                <div className="bg-white rounded-3xl p-8 border border-slate-100 text-center">
+                  <p className="text-slate-600 font-medium">
+                    Upload Image to Analyze.
+                  </p>
+                </div>
+              )}
 
               {prediction && !showRecommendations && (
                 <div className="relative">
@@ -396,7 +407,7 @@ const Dashboard: React.FC = () => {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <PredictionCard prediction={prediction} onFindDoctors={handleFindNearby} />
+                  <PredictionCard prediction={prediction} onShowHospitals={handleShowHospitals} />
                   {isLocating && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-3xl z-20">
                       <div className="flex flex-col items-center gap-3">
@@ -422,19 +433,7 @@ const Dashboard: React.FC = () => {
                     </Button>
                   </div>
 
-                  <div className="flex gap-2 p-1 bg-slate-100 rounded-xl w-fit">
-                    <button
-                      onClick={() => setResultView("hospitals")}
-                      className={cn(
-                        "px-6 py-2 rounded-lg text-sm font-bold",
-                        resultView === "hospitals"
-                          ? "bg-white shadow-sm text-primary"
-                          : "text-slate-500"
-                      )}
-                    >
-                      Dermatology Hospitals & Clinics
-                    </button>
-                  </div>
+      
 
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {realHospitals.length === 0 ? (
@@ -569,24 +568,42 @@ const Dashboard: React.FC = () => {
                     <p className="text-[10px] uppercase font-bold text-slate-400">
                       City
                     </p>
-                    <input
+                    <select
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="Enter your city"
-                      className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    />
+                      disabled={!stateName}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">
+                        {stateName ? "Select City" : "Select State First"}
+                      </option>
+                      {cities.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase font-bold text-slate-400">
                      State
                     </p>
-                   <input
+                   <select
                       value={stateName}
-                      onChange={(e) => setStateName(e.target.value)}
-                      placeholder="Enter your state"
-                      className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    />
+                      onChange={(e) => {
+                        setStateName(e.target.value);
+                        setCity(""); // reset city when state changes
+                      }}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">Select State</option>
+                      {states.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

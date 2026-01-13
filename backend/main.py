@@ -1,8 +1,4 @@
-from dotenv import load_dotenv
 import os
-
-env_path = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(env_path)
 import sys
 import tempfile
 import requests
@@ -10,10 +6,14 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from geopy.distance import geodesic
-from backend.places_service import fetch_dermatology_hospitals, fetch_place_details
+from backend.places_service import (
+    fetch_dermatology_hospitals,
+    fetch_place_details,
+    PLACES_KEY
+)
 from backend.location_data import STATE_CITY_MAP
 
-
+print("MAIN USING GOOGLE PLACES KEY:", PLACES_KEY[:6], "****")
 
 # --------------------------------------------------
 # PATH SETUP (reuse your existing ml_code)
@@ -117,21 +117,33 @@ def run_overpass(query: str, headers: dict):
     return None
 
 def geocode_city_state(city: str, state: str):
-    url = "https://maps.googleapis.com/maps/api/geocode/json"
-    params = {
-        "address": f"{city}, {state}, India",
-        "key": PLACES_KEY
+    headers = {
+        "User-Agent": "AI-Skin-Disease-App/1.0 (academic-project)"
     }
 
-    res = requests.get(url, params=params, timeout=10)
-    res.raise_for_status()
+    res = requests.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={
+            "q": f"{city}, {state}, India",
+            "format": "json",
+            "limit": 1
+        },
+        headers=headers,
+        timeout=10
+    )
+
+    if res.status_code != 200:
+        raise RuntimeError("Geocoding failed: HTTP error")
+
     data = res.json()
+    if not data:
+        raise RuntimeError("Geocoding failed: No results")
 
-    if data.get("status") != "OK":
-        raise Exception(f"Geocoding failed: {data.get('status')}")
+    lat = float(data[0]["lat"])
+    lng = float(data[0]["lon"])
 
-    location = data["results"][0]["geometry"]["location"]
-    return location["lat"], location["lng"]
+    return lat, lng
+
 
 
 
