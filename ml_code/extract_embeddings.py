@@ -8,7 +8,7 @@ from tensorflow.keras.layers import GlobalAveragePooling2D
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-from ml_code.config import DATA_DIR, EMB_DIR, IMG_SIZE
+from config import DATA_DIR, EMB_DIR, IMG_SIZE
 
 EMB_DIR.mkdir(parents=True, exist_ok=True)
 

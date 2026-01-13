@@ -1,0 +1,38 @@
+# ---- Python virtual env ----
+venv/
+
+# ---- Python cache / compiled ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ---- Environment / secrets ----
+.env
+*.env
+
+# ---- Logs / temp ----
+*.log
+tmp/
+temp/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- IDE ----
+.vscode/
+.idea/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+venv/
+.env
+artifacts/
+streamlit_app/uploads/
+*.sqlite3
+.DS_Store
+.vscode/
+.idea/

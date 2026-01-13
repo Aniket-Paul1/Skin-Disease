@@ -2,7 +2,7 @@
 import random
 import shutil
 from pathlib import Path
-from ml_code.config import SRC_IMAGES, DATA_DIR, RANDOM_SEED, VAL_SPLIT
+from config import SRC_IMAGES, DATA_DIR, RANDOM_SEED, VAL_SPLIT
 
 random.seed(RANDOM_SEED)
 

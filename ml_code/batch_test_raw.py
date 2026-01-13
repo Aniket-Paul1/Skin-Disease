@@ -5,7 +5,7 @@ import json
 import numpy as np
 import joblib
 from tqdm import tqdm
-from ml_code.config import RAW_IMAGES, MODELS_DIR, IMG_SIZE
+from config import RAW_IMAGES, MODELS_DIR, IMG_SIZE
 import warnings
 warnings.filterwarnings("ignore")
 

@@ -1,38 +1,38 @@
-# ---- Python virtual env ----
-venv/
+# ===== ENV & SECRETS =====
+.env
+.env.*
+*.env
 
-# ---- Python cache / compiled ----
+# ===== PYTHON =====
+venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# ---- Environment / secrets ----
-.env
-*.env
+# ===== ML / DATA =====
+*.h5
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.npz
+*.csv
+*.zip
+data/
+dataset/
+datasets/
+images/
+uploads/
 
-# ---- Logs / temp ----
+# ===== NODE / FRONTEND =====
+node_modules/
+dist/
+build/
+
+# ===== LOGS =====
 *.log
-tmp/
-temp/
 
-# ---- Jupyter ----
-.ipynb_checkpoints/
-
-# ---- IDE ----
-.vscode/
-.idea/
-
-# ---- OS files ----
+# ===== OS =====
 .DS_Store
 Thumbs.db
-__pycache__/
-*.pyc
-venv/
-.env
-artifacts/
-streamlit_app/uploads/
-*.sqlite3
-.DS_Store
-.vscode/
-.idea/

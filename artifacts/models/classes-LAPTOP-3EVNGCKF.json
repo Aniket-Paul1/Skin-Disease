@@ -1,0 +1,10 @@
+{
+  "Acne": 0,
+  "BasalCellCarcinoma": 1,
+  "Bullous": 2,
+  "Dermatitis_Eczema": 3,
+  "Herpes": 4,
+  "Melanoma": 5,
+  "Psoriasis": 6,
+  "Vitiligo": 7
+}

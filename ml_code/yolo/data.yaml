@@ -1,0 +1,6 @@
+path: ml_code/yolo
+train: images/train
+val: images/train
+
+names:
+  0: lesion

@@ -7,7 +7,7 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from ml_code.config import DATA_DIR, MODELS_DIR, IMG_SIZE, BATCH_SIZE
+from config import DATA_DIR, MODELS_DIR, IMG_SIZE, BATCH_SIZE
 
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_PATH = MODELS_DIR / "cnn_model.h5"

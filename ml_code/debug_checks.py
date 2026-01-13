@@ -2,7 +2,7 @@
 import joblib, json, os, random
 from pathlib import Path
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-from ml_code.config import MODELS_DIR, EMB_DIR, DATA_DIR, IMG_SIZE
+from config import MODELS_DIR, EMB_DIR, DATA_DIR, IMG_SIZE
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
