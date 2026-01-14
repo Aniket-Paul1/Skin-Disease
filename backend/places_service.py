@@ -19,33 +19,58 @@ PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/jso
 PLACES_DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json"
 
 
-def fetch_dermatology_hospitals(lat, lng, radius=5000):
+def fetch_dermatology_hospitals(lat, lng, radius=7000):
     if not PLACES_KEY:
         raise RuntimeError("GOOGLE_PLACES_API_KEY not loaded")
 
     print("USING GOOGLE PLACES KEY:", PLACES_KEY[:6], "****")
     print("SEARCHING NEAR:", lat, lng)
 
-    params = {
-        "location": f"{lat},{lng}",
-        "radius": radius,
-        "type": "hospital",
-        "keyword": "dermatology skin clinic",
-        "key": PLACES_KEY
-    }
+    # Broad but safe keywords
+    keywords = [
+        "dermatology",
+        "skin clinic",
+        "skin hospital",
+        "dermatologist",
+        "chर्म रोग",          # Hindi (important for India)
+        "skin care clinic",
+        "cosmetic clinic"
+    ]
 
-    res = requests.get(PLACES_NEARBY_URL, params=params, timeout=10)
-    res.raise_for_status()
+    collected = {}
 
-    data = res.json()
+    for keyword in keywords:
+        params = {
+            "location": f"{lat},{lng}",
+            "radius": radius,
+            "type": "hospital",
+            "keyword": keyword,
+            "key": PLACES_KEY
+        }
+
+        res = requests.get(PLACES_NEARBY_URL, params=params, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+
+        for place in data.get("results", []):
+            place_id = place.get("place_id")
+            if not place_id:
+                continue
+
+            # Deduplicate across keyword searches
+            collected[place_id] = place
+
     results = []
 
-    for place in data.get("results", []):
+    for place in collected.values():
         name = place.get("name", "").lower()
         types = place.get("types", [])
 
-        # 🔒 STRICT dermatology filter
-        if not any(k in name for k in ["derma", "skin", "चर्म"]):
+        # 🔒 FINAL dermatology filter (important)
+        if not any(
+            k in name
+            for k in ["derma", "skin", "cosmetic", "चर्म"]
+        ):
             continue
 
         results.append({
@@ -60,15 +85,15 @@ def fetch_dermatology_hospitals(lat, lng, radius=5000):
             "map_url": f"https://www.google.com/maps/place/?q=place_id:{place.get('place_id')}"
         })
 
-    # ⭐ Sort by Google rating (highest first)
-    results = sorted(
-        results,
+    # ⭐ Sort by real Google rating
+    results.sort(
         key=lambda x: x.get("rating", 0) or 0,
         reverse=True
     )
 
     print("DERMATOLOGY RESULTS FOUND:", len(results))
     return results
+
 
 
 

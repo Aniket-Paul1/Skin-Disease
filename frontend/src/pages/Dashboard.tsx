@@ -418,6 +418,64 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               )}
+              {/* Location Preferences */}
+              <div className="pt-6 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Location Preferences
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase font-bold text-slate-400">
+                      City
+                    </p>
+                    <select
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      disabled={!stateName}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">
+                        {stateName ? "Select City" : "Select State First"}
+                      </option>
+                      {cities.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase font-bold text-slate-400">
+                     State
+                    </p>
+                   <select
+                      value={stateName}
+                      onChange={(e) => {
+                        setStateName(e.target.value);
+                        setCity(""); // reset city when state changes
+                      }}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">Select State</option>
+                      {states.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleSaveLocation}
+                  disabled={savingLocation}
+                  className="mt-4 rounded-xl"
+                >
+                  {savingLocation ? "Saving..." : "Save Location"}
+                </Button>
+              </div>
 
               {showRecommendations && (
                 <div className="space-y-6 animate-slide-up">
@@ -432,8 +490,6 @@ const Dashboard: React.FC = () => {
                       Close
                     </Button>
                   </div>
-
-      
 
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {realHospitals.length === 0 ? (
@@ -555,65 +611,6 @@ const Dashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Location Preferences */}
-              <div className="pt-6 space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Location Preferences
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">
-                      City
-                    </p>
-                    <select
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      disabled={!stateName}
-                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">
-                        {stateName ? "Select City" : "Select State First"}
-                      </option>
-                      {cities.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">
-                     State
-                    </p>
-                   <select
-                      value={stateName}
-                      onChange={(e) => {
-                        setStateName(e.target.value);
-                        setCity(""); // reset city when state changes
-                      }}
-                      className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">Select State</option>
-                      {states.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSaveLocation}
-                  disabled={savingLocation}
-                  className="mt-4 rounded-xl"
-                >
-                  {savingLocation ? "Saving..." : "Save Location"}
-                </Button>
               </div>
             </div>
           )}

@@ -251,7 +251,7 @@ def get_verified_doctors(city: str, state: str):
 
         hospitals_sorted = sorted(
             hospitals,
-            key=lambda h: h.get("rating", 0),
+            key=lambda h: h["rating"] if isinstance(h.get("rating"), (int, float)) else 0,
             reverse=True
         )
 
