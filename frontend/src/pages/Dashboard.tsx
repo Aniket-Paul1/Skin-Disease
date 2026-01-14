@@ -340,6 +340,8 @@ const Dashboard: React.FC = () => {
         title: "Location updated",
         description: "Your location has been saved successfully.",
       });
+      
+      fetchHospitals();
 
     } catch (err: any) {
       toast({

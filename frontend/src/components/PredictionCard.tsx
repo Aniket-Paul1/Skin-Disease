@@ -9,6 +9,7 @@ import {
 import { PredictionResult } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { CONDITION_INFO } from "@/data/conditionInfo";
 
 interface PredictionCardProps {
   prediction: PredictionResult;
@@ -49,6 +50,11 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 
   const severity = severityConfig[severityKey] || severityConfig.mild;
   const SeverityIcon = severity.icon;
+  const conditionKey = prediction.disease?.toLowerCase();
+  const conditionInfo = conditionKey
+    ? CONDITION_INFO[conditionKey]
+    : null;
+
 
   return (
     <div className="bg-card rounded-2xl shadow-card border border-border overflow-hidden animate-scale-in">
@@ -99,6 +105,44 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
               </ul>
             </div>
           )}
+        {/* ABOUT THE CONDITION */}
+        {conditionInfo && (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+            <h4 className="font-bold text-slate-900">
+              About {conditionInfo.title}
+            </h4>
+
+            <p className="text-sm text-slate-600">
+              {conditionInfo.description}
+            </p>
+
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase">
+                Common Causes
+              </p>
+              <ul className="list-disc list-inside text-sm text-slate-600">
+                {conditionInfo.causes.map((cause, i) => (
+                  <li key={i}>{cause}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase">
+                General Care & Remedies
+              </p>
+              <ul className="list-disc list-inside text-sm text-slate-600">
+                {conditionInfo.remedies.map((remedy, i) => (
+                  <li key={i}>{remedy}</li>
+                ))}
+              </ul>
+            </div>
+
+            <p className="text-xs text-slate-500 italic">
+              {conditionInfo.note}
+            </p>
+          </div>
+        )}
 
         <Button
           onClick={onShowHospitals}
