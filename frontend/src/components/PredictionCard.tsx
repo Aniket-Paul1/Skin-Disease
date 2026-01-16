@@ -50,10 +50,18 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 
   const severity = severityConfig[severityKey] || severityConfig.mild;
   const SeverityIcon = severity.icon;
-  const conditionKey = prediction.disease?.toLowerCase();
+  const conditionKey = prediction.disease
+    ?.toLowerCase()
+    .replace(/\(.*?\)/g, "")   // remove (onychomycosis)
+    .replace(/'/g, "")         // remove apostrophes
+    .replace(/[^a-z\s]/g, "")  // remove special chars
+    .trim()
+    .replace(/\s+/g, "_");     // spaces → underscores
+
   const conditionInfo = conditionKey
     ? CONDITION_INFO[conditionKey]
     : null;
+
 
 
   return (

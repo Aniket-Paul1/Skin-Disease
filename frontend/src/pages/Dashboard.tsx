@@ -147,7 +147,6 @@ const Dashboard: React.FC = () => {
             </div>
             <div style="text-align:right">
               <p style="margin:0;"><strong>Date:</strong> ${new Date(item.created_at || Date.now()).toLocaleDateString()}</p>
-              <p style="margin:0; font-size:12px;">ID: ${item.id || 'Pending'}</p>
             </div>
           </div>
 
@@ -163,11 +162,6 @@ const Dashboard: React.FC = () => {
               <p style="text-transform:uppercase; font-size:12px; font-weight:bold; color:#64748b; margin-bottom:5px;">Detected Condition</p>
               <h2 class="disease-title">${item.disease}</h2>
               <div class="confidence-badge">AI Confidence: ${item.confidence.toFixed(1)}%</div>
-              
-              <div class="description-box">
-                <p><strong>Clinical Notes:</strong></p>
-                <p>${item.description}</p>
-              </div>
             </div>
           </div>
 
@@ -219,7 +213,6 @@ const Dashboard: React.FC = () => {
                 <span class="date">${new Date(item.created_at).toLocaleDateString()}</span>
               </div>
               <div class="confidence">AI Confidence: ${item.confidence.toFixed(1)}%</div>
-              <p class="description">${item.description}</p>
             </div>
           `).join('')}
           <div class="footer">
