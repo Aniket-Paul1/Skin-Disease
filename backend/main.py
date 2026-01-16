@@ -240,14 +240,28 @@ def find_nearby_dermatologists(
     results.sort(key=lambda x: x["distance_km"])
     return results[:10]
 
-@app.get("/verified-doctors")
-def get_verified_doctors(city: str, state: str):
-    try:
-        city = city.strip().title()
-        state = state.strip().title()
+from typing import Optional
 
-        lat, lng = geocode_city_state(city, state)
-        hospitals = fetch_dermatology_hospitals(lat, lng)
+@app.get("/verified-doctors")
+def get_verified_doctors(
+    city: Optional[str] = None,
+    state: Optional[str] = None,
+    lat: Optional[float] = None,
+    lng: Optional[float] = None
+):
+    try:
+        if lat is not None and lng is not None:
+            # 📍 GPS-based search
+            hospitals = fetch_dermatology_hospitals(lat, lng)
+
+        elif city and state:
+            city = city.strip().title()
+            state = state.strip().title()
+            lat, lng = geocode_city_state(city, state)
+            hospitals = fetch_dermatology_hospitals(lat, lng)
+
+        else:
+            return []
 
         hospitals_sorted = sorted(
             hospitals,
@@ -260,6 +274,7 @@ def get_verified_doctors(city: str, state: str):
     except Exception as e:
         print("Verified doctors error:", e)
         return []
+
 
 
 @app.get("/locations/states")

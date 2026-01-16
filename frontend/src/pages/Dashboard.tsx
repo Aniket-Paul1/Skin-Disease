@@ -49,6 +49,11 @@ const Dashboard: React.FC = () => {
   const [savingLocation, setSavingLocation] = useState(false);
   const [states, setStates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
+  const isLocationFilled = city.trim() !== "" && stateName.trim() !== "";
+  const [locationSaved, setLocationSaved] = useState(false);
+  const [useLiveLocation, setUseLiveLocation] = useState(false);
+
+
 
 
 
@@ -63,27 +68,80 @@ const Dashboard: React.FC = () => {
 
     if (!error) setHistory(data || []);
   };
-  const fetchHospitals = async () => {
-    if (!city || !stateName) return;
 
-    try {
-      setIsLocating(true);
-
-      const res = await fetch(
-        `http://127.0.0.1:8000/verified-doctors?city=${encodeURIComponent(
-          city
-        )}&state=${encodeURIComponent(stateName)}`
-      );
-
-      const data = await res.json();
-      setRealHospitals(data);
-      setShowRecommendations(true);
-    } catch (err) {
-      console.error("Hospital fetch failed", err);
-    } finally {
-      setIsLocating(false);
+  const fetchHospitalsByLiveLocation = async () => {
+    if (!navigator.geolocation) {
+      toast({
+        variant: "destructive",
+        title: "Location not supported",
+        description: "Your browser does not support location access.",
+      });
+      return;
     }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          const res = await fetch(
+            `http://127.0.0.1:8000/verified-doctors?lat=${latitude}&lng=${longitude}`
+          );
+
+          const data = await res.json();
+          setRealHospitals(data);
+          setShowRecommendations(true);
+        } catch (err) {
+          toast({
+            variant: "destructive",
+            title: "Failed to fetch hospitals",
+            description: "Unable to load nearby hospitals.",
+          });
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      () => {
+        setIsLocating(false);
+        toast({
+          variant: "destructive",
+          title: "Location permission denied",
+          description: "Please allow location access or save your city and state.",
+        });
+      }
+    );
   };
+
+
+  const fetchHospitals = async () => {
+    // ✅ Case 1: Saved location exists
+    if (city && stateName) {
+      try {
+        setIsLocating(true);
+
+        const res = await fetch(
+          `http://127.0.0.1:8000/verified-doctors?city=${encodeURIComponent(
+            city
+          )}&state=${encodeURIComponent(stateName)}`
+        );
+
+        const data = await res.json();
+        setRealHospitals(data);
+        setShowRecommendations(true);
+      } catch (err) {
+        console.error("Hospital fetch failed", err);
+      } finally {
+        setIsLocating(false);
+      }
+      return;
+    }
+
+    // ✅ Case 2: No saved location → use live location
+    fetchHospitalsByLiveLocation();
+  };
+
 
 
   useEffect(() => {
@@ -114,6 +172,11 @@ const Dashboard: React.FC = () => {
       .then(data => setCities(data))
       .catch(err => console.error("Failed to load cities", err));
   }, [stateName]);
+
+  useEffect(() => {
+    setLocationSaved(false);
+  }, [city, stateName]);
+
 
 
 
@@ -303,12 +366,30 @@ const Dashboard: React.FC = () => {
       setIsAnalyzing(false);
     }
   };
+  
   const handleShowHospitals = () => {
-    fetchHospitals();
+    // If location is saved → use saved location
+    if (city && stateName) {
+      fetchHospitals();
+      return;
+    }
+
+    // If user explicitly chose live location
+    if (useLiveLocation) {
+      fetchHospitalsByLiveLocation();
+      return;
+    }
+
+    // Otherwise → ask user to choose
+    toast({
+      title: "Location required",
+      description: "Please save your city & state or use your current location.",
+    });
   };
 
+
   const handleSaveLocation = async () => {
-    if (!city || !stateName) {
+    if (!city.trim() || !stateName.trim()) {
       toast({
         variant: "destructive",
         title: "Missing information",
@@ -322,8 +403,8 @@ const Dashboard: React.FC = () => {
 
       const { error } = await supabase.auth.updateUser({
         data: {
-          city,
-          state: stateName,
+          city: city.trim(),
+          state: stateName.trim(),
         },
       });
 
@@ -333,8 +414,12 @@ const Dashboard: React.FC = () => {
         title: "Location updated",
         description: "Your location has been saved successfully.",
       });
-      
-      fetchHospitals();
+
+      // ✅ Mark location as saved (used to hide Save button)
+      setLocationSaved(true);
+
+      // ✅ Automatically refresh hospitals for new location
+      await fetchHospitals();
 
     } catch (err: any) {
       toast({
@@ -346,6 +431,7 @@ const Dashboard: React.FC = () => {
       setSavingLocation(false);
     }
   };
+
 
 
   return (
@@ -413,6 +499,26 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               )}
+              
+              {/* Use Live Location (only if no saved location) */}
+              {prediction && !showRecommendations && !city && !stateName && (
+                <div className="bg-white rounded-2xl p-4 border border-slate-100 text-center">
+                  <p className="text-sm text-slate-600 mb-3">
+                    You have not saved your location yet.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full font-bold"
+                    onClick={() => {
+                      setUseLiveLocation(true);
+                      fetchHospitalsByLiveLocation();
+                    }}
+                  >
+                    Use my current location
+                  </Button>
+                </div>
+              )}
+
               {/* Location Preferences */}
               <div className="pt-6 space-y-4">
                 <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
@@ -463,13 +569,21 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleSaveLocation}
-                  disabled={savingLocation}
-                  className="mt-4 rounded-xl"
-                >
-                  {savingLocation ? "Saving..." : "Save Location"}
-                </Button>
+                {isLocationFilled && !locationSaved && (
+                  <Button
+                    onClick={handleSaveLocation}
+                    disabled={savingLocation}
+                    className="mt-4 w-full font-bold rounded-xl"
+                  >
+                    {savingLocation ? "Saving..." : "Save Location"}
+                  </Button>
+                )}
+                {locationSaved && (
+                  <p className="text-sm text-green-600 font-semibold mt-3">
+                    Location saved successfully
+                  </p>
+                )}
+
               </div>
 
               {showRecommendations && (
