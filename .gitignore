@@ -1,0 +1,39 @@
+# ===== ENV & SECRETS =====
+.env
+.env.*
+*.env
+
+# ===== PYTHON =====
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== ML / DATA =====
+*.onnx
+*.jpeg
+*.webp
+*.jpg
+*.png
+*.ckpt
+*.npz
+*.csv
+*.zip
+data/
+dataset/
+datasets/
+images/
+uploads/
+
+# ===== NODE / FRONTEND =====
+node_modules/
+dist/
+build/
+
+# ===== LOGS =====
+*.log
+
+# ===== OS =====
+.DS_Store
+Thumbs.db

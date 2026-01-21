@@ -1,0 +1,32 @@
+{
+  "Acne": "Dermatologist",
+  "Rosacea": "Dermatologist",
+  "Dermatitis_Eczema": "Dermatologist",
+  "Contact Dermatitis": "Dermatologist",
+  "Seborrheic Dermatitis": "Dermatologist",
+
+  "Psoriasis": "Dermatologist",
+  "Vitiligo": "Dermatologist",
+
+  "Basal Cell Carcinoma": "Dermatologist / Oncologist",
+  "Melanoma": "Dermatologist / Oncologist",
+
+  "Herpes": "Dermatologist / Infectious Disease Specialist",
+  "Impetigo": "Dermatologist / Infectious Disease Specialist",
+
+  "Bullous": "Dermatologist",
+  "Bullous Pemphigoid": "Dermatologist",
+
+  "Hives (Urticaria)": "Dermatologist / Allergist",
+
+  "Athlete's Foot (Tinea Pedis)": "Dermatologist",
+  "Ringworm": "Dermatologist",
+  "Fungal Infection": "Dermatologist",
+
+  "Nail Fungus (Onychomycosis)": "Dermatologist",
+
+  "Lupus Rash": "Dermatologist / Rheumatologist",
+
+  "Healthy Skin": "No Specialist Required",
+  "Unknown": "General Physician"
+}
