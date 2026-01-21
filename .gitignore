@@ -1,6 +1,5 @@
 # ===== ENV & SECRETS =====
 .env
-.env.*
 *.env
 
 # ===== PYTHON =====
